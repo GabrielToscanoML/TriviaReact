@@ -100,4 +100,4 @@ Login.propTypes = {
   }).isRequired,
 };
 
-export default connect(mapStateToProps)(Login);
+export default connect()(Login);
