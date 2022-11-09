@@ -39,6 +39,12 @@ class Login extends React.Component {
     const { dispatch, history } = this.props;
     dispatch(getToken());
     history.push('/urlDoJogo');
+  }
+
+  onClickButton = () => {
+    const { history } = this.props;
+    console.log(this.props);
+    history.push('/configuration');
   };
 
   render() {
@@ -75,6 +81,13 @@ class Login extends React.Component {
         >
           Play
         </button>
+        <button
+          type="button"
+          data-testid="btn-settings"
+          onClick={ this.onClickButton }
+        >
+          Configurações
+        </button>
       </form>
     );
   }
@@ -82,6 +95,9 @@ class Login extends React.Component {
 
 Login.propTypes = {
   dispatch: PropTypes.func.isRequired,
-  history: PropTypes.shape().isRequired,
+  history: PropTypes.shape({
+    push: PropTypes.func,
+  }).isRequired,
 };
+
 export default connect(mapStateToProps)(Login);
