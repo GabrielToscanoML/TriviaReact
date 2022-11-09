@@ -39,7 +39,7 @@ class Login extends React.Component {
     const { dispatch, history } = this.props;
     dispatch(getToken());
     history.push('/urlDoJogo');
-  }
+  };
 
   onClickButton = () => {
     const { history } = this.props;
