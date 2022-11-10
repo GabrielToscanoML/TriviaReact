@@ -2,7 +2,6 @@
 
 const initialState = {
   name: '',
-  assertions: '',
   score: 0,
   gravatarEmail: '',
 };
@@ -16,8 +15,6 @@ const player = (state = initialState, action) => {
       name: action.value.name,
       gravatarEmail: action.value.email,
       score: action.value.score,
-      assertions: action.value.name,
-
     };
   default:
     return state;
