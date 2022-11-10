@@ -1,5 +1,5 @@
 import renderWithRouterAndRedux from "./helpers/renderWithRouterAndRedux";
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from '../App';
 
@@ -32,12 +32,17 @@ describe('Testa a página de login', () => {
       expect(history.location.pathname).toBe('/configuration');
    });
 
-   test('Verifica se o botão de play redireciona para a página correta', () => {
+   test('Verifica se o botão de play redireciona para a página correta', async () => {
+      jest.spyOn(global, 'fetch');
+      global.fetch.mockResolvedValue({
+         json: jest.fn().mockResolvedValue({token: '9c0bc17ffc4b6f8dc8cc5175c72887295f1dbd110366144ee5646dab14cd46a5'})
+      })
       const { history } = renderWithRouterAndRedux(<App />);
+
 
       userLogin('Name tester', 'tester@tester.com');
       userEvent.click(screen.getByTestId('btn-play'));
   
-      expect(history.location.pathname).toBe('/game')
+      await waitFor(() => expect(history.location.pathname).toBe('/game'))
     });
 });
