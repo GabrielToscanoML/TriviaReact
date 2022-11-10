@@ -10,34 +10,56 @@ class GamePage extends Component {
     this.state = {
       questionIndex: 0,
       score: 0,
+      timer: 30,
+      isWaiting: true,
+      areDisabled: false,
     };
   }
 
   async componentDidMount() {
+    const { questionIndex } = this.state;
     const localToken = localStorage.getItem('token');
     try {
       const response = await fetch(`https://opentdb.com/api.php?amount=5&token=${localToken}`);
       const questions = await response.json();
 
+      this.waitFiveSeconds(this.startTimer);
+
       const expiredTokenCode = 3;
       if (questions.response_code === expiredTokenCode
         || questions.token === 'INVALID_TOKEN') {
-        this.returnToLogin();
+        this.redirectToPage();
       }
+
       this.setState({ questions: questions.results });
+      this.prepData(questions.results, questionIndex);
     } catch (error) {
       console.log(error);
-      this.returnToLogin();
+      this.redirectToPage();
     }
   }
 
-  returnToLogin = () => {
+  componentDidUpdate() {
+
+  }
+
+  waitFiveSeconds = (funcToBeExecuted) => {
+    this.setState({ isWaiting: true });
+
+    const fiveSeconds = 5000;
+    setTimeout(() => {
+      funcToBeExecuted();
+      this.setState({ isWaiting: false });
+    }, fiveSeconds);
+  };
+
+  redirectToPage = (pathname = '/') => {
     const { history } = this.props;
 
     localStorage.removeItem('token');
     this.setState({ questionIndex: 0 });
 
-    history.push('/');
+    history.push(pathname);
   };
 
   checkAnswer = (answer) => {
@@ -49,7 +71,7 @@ class GamePage extends Component {
     console.log(answer.value ? 'Correto!' : 'Incorreto!');
 
     const maxQuestionsDelayed = 4;
-    if (questionIndex === maxQuestionsDelayed) return this.returnToLogin();
+    if (questionIndex === maxQuestionsDelayed) return this.redirectToPage('/feedback');
   };
 
   prepData = (possibleAnswers, index) => {
@@ -58,7 +80,9 @@ class GamePage extends Component {
     if (currQuestion.type === 'boolean') {
       const answers = [{ answer: currQuestion.correct_answer, value: true },
         { answer: currQuestion.incorrect_answers[0], value: false, index: 0 }];
-      return answers;
+      const numForShuffle = 0.5;
+      const ShuffledAnswers = answers.sort(() => numForShuffle - Math.random());
+      this.setState({ answers: ShuffledAnswers });
     }
 
     const incorrect = currQuestion.incorrect_answers
@@ -67,14 +91,38 @@ class GamePage extends Component {
     const answers = [...incorrect, correct];
     const numForShuffle = 0.5;
     const ShuffledAnswers = answers.sort(() => numForShuffle - Math.random());
-    return ShuffledAnswers;
+    this.setState({ answers: ShuffledAnswers });
+  };
+
+  startTimer = () => {
+    this.setState({ timer: 30 });
+    const oneSecond = 1000;
+    const interval = setInterval(() => {
+      const { timer } = this.state;
+      this.setState({ timer: timer - 1 });
+
+      if (timer === 1) {
+        this.setState({ areDisabled: true });
+
+        clearInterval(interval);
+      }
+    }, oneSecond);
   };
 
   render() {
-    const { questions, questionIndex, score } = this.state;
-    if (!questions) return <p>Loading...</p>;
+    const { questions, questionIndex, score, timer, answers,
+      areDisabled, isWaiting } = this.state;
 
-    const answers = this.prepData(questions, questionIndex);
+    if (!questions) return <p>Loading...</p>;
+    if (isWaiting) {
+      return (
+        <div>
+          <Header />
+          <p>{questions[questionIndex].category}</p>
+          <p>{questions[questionIndex].question}</p>
+        </div>
+      );
+    }
 
     return (
       <div>
@@ -85,6 +133,11 @@ class GamePage extends Component {
           {' '}
           {score}
         </p>
+        <span>
+          Time:
+          {' '}
+          {timer}
+        </span>
         <p
           id="category"
           data-testid="question-category"
@@ -102,6 +155,7 @@ class GamePage extends Component {
             <button
               type="button"
               key={ i }
+              disabled={ areDisabled }
               onClick={ () => this.checkAnswer(currAnswer) }
               data-testid={ currAnswer.value ? 'correct-answer'
                 : `wrong-answer-${currAnswer.index}` }
