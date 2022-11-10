@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { resetToken } from '../redux/actions';
+import Header from '../components/Header';
 
 class GamePage extends Component {
   constructor() {
@@ -89,6 +90,8 @@ class GamePage extends Component {
 
     return (
       <div>
+        <Header />
+
         <p id="score">
           Score:
           {' '}
