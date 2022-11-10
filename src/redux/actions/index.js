@@ -1,5 +1,6 @@
 export const userLogin = 'userLogin';
 
+export const RESET_TOKEN = 'RESET_TOKEN';
 export const REQUEST_TOKEN = 'REQUEST_TOKEN';
 export const RESPONSE_TOKEN = 'RESPONSE_TOKEN';
 export const RESPONSE_FAIL = 'RESPONSE_FAIL';
@@ -18,6 +19,10 @@ const responseToken = (token) => ({
 const responseFail = (error) => ({
   type: RESPONSE_TOKEN,
   payload: error,
+});
+
+export const resetToken = () => ({
+  type: RESET_TOKEN,
 });
 
 export const getToken = () => async (dispatch) => {

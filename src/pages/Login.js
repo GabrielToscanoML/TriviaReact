@@ -38,7 +38,7 @@ class Login extends React.Component {
   handleClick = () => {
     const { dispatch, history } = this.props;
     dispatch(getToken());
-    history.push('/urlDoJogo');
+    history.push('/game');
   };
 
   onClickButton = () => {
