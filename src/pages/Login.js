@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { playerUser } from '../redux/actions';
+import { getToken } from '../redux/actions';
 
 class Login extends React.Component {
   constructor() {
@@ -39,7 +40,14 @@ class Login extends React.Component {
   handleClick = () => {
     const { history, dispatch } = this.props;
     dispatch(playerUser(this.state));
+    dispatch(getToken());
     history.push('/game');
+  };
+
+  onClickButton = () => {
+    const { history } = this.props;
+    console.log(this.props);
+    history.push('/configuration');
   };
 
   render() {
@@ -76,6 +84,13 @@ class Login extends React.Component {
         >
           Play
         </button>
+        <button
+          type="button"
+          data-testid="btn-settings"
+          onClick={ this.onClickButton }
+        >
+          Configurações
+        </button>
       </form>
     );
   }
@@ -83,7 +98,9 @@ class Login extends React.Component {
 
 Login.propTypes = {
   dispatch: PropTypes.func.isRequired,
-  history: PropTypes.shape().isRequired,
+  history: PropTypes.shape({
+    push: PropTypes.func,
+  }).isRequired,
 };
 
 export default connect()(Login);
