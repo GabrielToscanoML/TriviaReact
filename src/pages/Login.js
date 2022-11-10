@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { playerUser, getToken } from '../redux/actions';
+import { playerUser } from '../redux/actions';
 
 class Login extends React.Component {
   constructor() {
@@ -11,6 +11,7 @@ class Login extends React.Component {
       name: '',
       email: '',
       score: 0,
+      loading: false,
     };
   }
 
@@ -36,21 +37,32 @@ class Login extends React.Component {
     return !(result && name.length > 0);
   };
 
-  handleClick = () => {
+  handleClick = async () => {
     const { history, dispatch } = this.props;
+
+    this.setState({ loading: true });
+
     dispatch(playerUser(this.state));
-    dispatch(getToken());
+
+    const respose = await fetch('https://opentdb.com/api_token.php?command=request');
+    const data = await respose.json();
+    localStorage.setItem('token', data.token);
+
+    this.setState({ loading: false });
+
     history.push('/game');
   };
 
   onClickButton = () => {
     const { history } = this.props;
-    console.log(this.props);
     history.push('/configuration');
   };
 
   render() {
-    const { email, name } = this.state;
+    const { email, name, loading } = this.state;
+
+    if (loading) return <p>Loading...</p>;
+
     return (
       <form>
         <label htmlFor="name">

@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { resetToken } from '../redux/actions';
 import Header from '../components/Header';
 
 class GamePage extends Component {
@@ -15,18 +14,14 @@ class GamePage extends Component {
   }
 
   async componentDidMount() {
-    const { token } = this.props;
     const localToken = localStorage.getItem('token');
-    const getToken = token || localToken;
     try {
-      const response = await fetch(`https://opentdb.com/api.php?amount=5&token=${getToken}`);
+      const response = await fetch(`https://opentdb.com/api.php?amount=5&token=${localToken}`);
       const questions = await response.json();
 
       const expiredTokenCode = 3;
       if (questions.response_code === expiredTokenCode
         || questions.token === 'INVALID_TOKEN') {
-        const { dispatch } = this.props;
-        dispatch(resetToken());
         this.returnToLogin();
       }
       this.setState({ questions: questions.results });
@@ -48,12 +43,6 @@ class GamePage extends Component {
   checkAnswer = (answer) => {
     const { questionIndex } = this.state;
 
-    // const fiveSeconds = 5000;
-    // setTimeout(() => {
-    //   this.setState({
-    //     questionIndex: questionIndex + 1 });
-    // }, fiveSeconds);
-
     this.setState({
       questionIndex: questionIndex + 1 });
 
@@ -68,23 +57,22 @@ class GamePage extends Component {
 
     if (currQuestion.type === 'boolean') {
       const answers = [{ answer: currQuestion.correct_answer, value: true },
-        { answer: currQuestion.incorrect_answers[0], value: false }];
+        { answer: currQuestion.incorrect_answers[0], value: false, index: 0 }];
       return answers;
     }
 
     const incorrect = currQuestion.incorrect_answers
-      .map((incAns) => ({ answer: incAns, value: false }));
+      .map((incAns, i) => ({ answer: incAns, value: false, index: i }));
     const correct = { answer: currQuestion.correct_answer, value: true };
     const answers = [...incorrect, correct];
     const numForShuffle = 0.5;
-    const ShuffledAnswers = answers.sort(() => Math.random() - numForShuffle);
+    const ShuffledAnswers = answers.sort(() => numForShuffle - Math.random());
     return ShuffledAnswers;
   };
 
   render() {
     const { questions, questionIndex, score } = this.state;
-    const { loading } = this.props;
-    if (!questions || loading) return <p>Loading...</p>;
+    if (!questions) return <p>Loading...</p>;
 
     const answers = this.prepData(questions, questionIndex);
 
@@ -115,7 +103,8 @@ class GamePage extends Component {
               type="button"
               key={ i }
               onClick={ () => this.checkAnswer(currAnswer) }
-              data-testid={ currAnswer.value ? 'correct-answer' : `wrong-answer-${i}` }
+              data-testid={ currAnswer.value ? 'correct-answer'
+                : `wrong-answer-${currAnswer.index}` }
             >
               {currAnswer.answer}
             </button>))}
@@ -127,14 +116,6 @@ class GamePage extends Component {
 
 GamePage.propTypes = {
   history: PropTypes.shape({ push: PropTypes.func.isRequired }).isRequired,
-  dispatch: PropTypes.func.isRequired,
-  loading: PropTypes.bool.isRequired,
-  token: PropTypes.string.isRequired,
 };
 
-const mapStateToProps = (state) => ({
-  loading: state.tokenReducer.loading,
-  token: state.tokenReducer.token,
-});
-
-export default connect(mapStateToProps)(GamePage);
+export default connect()(GamePage);
