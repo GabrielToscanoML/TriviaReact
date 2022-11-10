@@ -1,8 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { playerUser } from '../redux/actions';
-import { getToken } from '../redux/actions';
+import { playerUser, getToken } from '../redux/actions';
 
 class Login extends React.Component {
   constructor() {
