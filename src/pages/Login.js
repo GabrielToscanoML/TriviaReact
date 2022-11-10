@@ -1,7 +1,7 @@
 import React from 'react';
-import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { getToken } from '../redux/actions';
+import { connect } from 'react-redux';
+import { playerUser, getToken } from '../redux/actions';
 
 class Login extends React.Component {
   constructor() {
@@ -10,6 +10,7 @@ class Login extends React.Component {
     this.state = {
       name: '',
       email: '',
+      score: 0,
     };
   }
 
@@ -36,7 +37,8 @@ class Login extends React.Component {
   };
 
   handleClick = () => {
-    const { dispatch, history } = this.props;
+    const { history, dispatch } = this.props;
+    dispatch(playerUser(this.state));
     dispatch(getToken());
     history.push('/game');
   };

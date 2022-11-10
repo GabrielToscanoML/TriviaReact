@@ -1,4 +1,5 @@
 export const userLogin = 'userLogin';
+export const PLAYER_USER = 'PLAYER_USER';
 
 export const RESET_TOKEN = 'RESET_TOKEN';
 export const REQUEST_TOKEN = 'REQUEST_TOKEN';
@@ -6,6 +7,7 @@ export const RESPONSE_TOKEN = 'RESPONSE_TOKEN';
 export const RESPONSE_FAIL = 'RESPONSE_FAIL';
 
 export const logIn = (value) => ({ type: userLogin, value });
+export const playerUser = (value) => ({ type: PLAYER_USER, value });
 
 const requestToken = () => ({
   type: REQUEST_TOKEN,
