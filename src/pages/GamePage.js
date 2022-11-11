@@ -123,8 +123,6 @@ class GamePage extends Component {
   };
 
   render() {
-
-    if (!questions) return <p>Loading...</p>;
     const { questions, questionIndex, score, timer, answers,
       areDisabled, isWaiting } = this.state;
 
