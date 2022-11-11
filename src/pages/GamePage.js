@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import md5 from 'crypto-js/md5';
 import PropTypes from 'prop-types';
 import Header from '../components/Header';
-import { sumAssertion } from '../redux/actions';
+import { playerUser, sumAssertion } from '../redux/actions';
 
 class GamePage extends Component {
   constructor() {
@@ -13,7 +14,7 @@ class GamePage extends Component {
       score: 0,
       isAnswered: false,
       timer: 30,
-      isWaiting: true,
+      isWaiting: false,
       areDisabled: false,
     };
   }
@@ -24,7 +25,8 @@ class GamePage extends Component {
       const response = await fetch(`https://opentdb.com/api.php?amount=5&token=${localToken}`);
       const questions = await response.json();
 
-      this.waitFiveSeconds(this.startTimer);
+      // this.waitFiveSeconds();
+      this.startTimer();
 
       const expiredTokenCode = 3;
       if (questions.response_code === expiredTokenCode
@@ -38,16 +40,6 @@ class GamePage extends Component {
       this.redirectToPage();
     }
   }
-
-  waitFiveSeconds = (funcToBeExecuted) => {
-    this.setState({ isWaiting: true });
-
-    const fiveSeconds = 5000;
-    setTimeout(() => {
-      funcToBeExecuted();
-      this.setState({ isWaiting: false });
-    }, fiveSeconds);
-  };
 
   redirectToPage = (pathname = '/') => {
     const { history } = this.props;
@@ -74,18 +66,27 @@ class GamePage extends Component {
     this.startTimer();
   };
 
-  checkAnswer = (answer) => {
-    const { interval } = this.state;
-    const { dispatch } = this.props;
+  checkAnswer = (answer, difficulty) => {
+    const { questionIndex, score, interval } = this.state;
+    const { name, email, dispatch } = this.props;
 
     if (answer.value === true) dispatch(sumAssertion(1));
     this.setState({
       isAnswered: true,
     });
-
     clearInterval(interval);
-
-    console.log(answer.value ? 'Correto!' : 'Incorreto!');
+    if (answer.value) {
+      this.calculatePoints(difficulty);
+    }
+    const maxQuestionsDelayed = 4;
+    if (questionIndex === maxQuestionsDelayed) {
+      const verification = JSON.parse(localStorage.getItem('ranking'));
+      if (verification) {
+        localStorage.setItem('ranking', JSON.stringify([...verification, { name, score, picture: `https://www.gravatar.com/avatar/${md5(email).toString()}` }]));
+      } else { localStorage.setItem('ranking', JSON.stringify([{ name, score, picture: `https://www.gravatar.com/avatar/${md5(email).toString()}` }])); }
+      dispatch(playerUser({ name, score, picture: `https://www.gravatar.com/avatar/${md5(email).toString()}` }));
+      this.redirectToPage('/feedback');
+    }
   };
 
   prepData = (possibleAnswers) => possibleAnswers.map((currQuestion) => {
@@ -119,6 +120,27 @@ class GamePage extends Component {
       }
     }, oneSecond);
     this.setState({ interval });
+  };
+
+  calculatePoints = () => {
+    const { questions, questionIndex, timer, score } = this.state;
+    let points = 0;
+    const hard = 3;
+    const medium = 2;
+    switch (questions[questionIndex].difficulty) {
+    case 'easy':
+      points = timer;
+      break;
+    case 'medium':
+      points = timer * medium;
+      break;
+    case 'hard':
+      points = timer * hard;
+      break;
+    default:
+      break;
+    }
+    this.setState({ score: score + points });
   };
 
   render() {
@@ -155,14 +177,12 @@ class GamePage extends Component {
       <div>
         <Header />
 
-        <p id="score">
+        <p data-testid="header-score" id="score">
           Score:
-          {' '}
           {score}
         </p>
         <span>
           Time:
-          {' '}
           {timer}
         </span>
         <p
@@ -184,7 +204,10 @@ class GamePage extends Component {
               key={ i }
               style={ { border: getBorderColor(isAnswered, currAnswer.value) } }
               disabled={ areDisabled }
-              onClick={ () => this.checkAnswer(currAnswer) }
+              onClick={ () => this.checkAnswer(
+                currAnswer,
+                questions[questionIndex].difficulty,
+              ) }
               data-testid={ currAnswer.value ? 'correct-answer'
                 : `wrong-answer-${currAnswer.index}` }
             >
@@ -209,7 +232,13 @@ class GamePage extends Component {
 
 GamePage.propTypes = {
   history: PropTypes.shape({ push: PropTypes.func.isRequired }).isRequired,
+  email: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
   dispatch: PropTypes.func.isRequired,
 };
+const mapStateToProps = (state) => ({
+  email: state.player.gravatarEmail,
+  name: state.player.name,
+});
 
-export default connect()(GamePage);
+export default connect(mapStateToProps)(GamePage);
