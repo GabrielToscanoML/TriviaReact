@@ -124,7 +124,7 @@ class GamePage extends Component {
 
   render() {
     const { questions, questionIndex, score, timer, answers,
-      areDisabled, isWaiting } = this.state;
+      areDisabled, isWaiting, isAnswered } = this.state;
 
     if (!questions) return <p>Loading...</p>;
     if (isWaiting) {
@@ -135,6 +135,24 @@ class GamePage extends Component {
           <p>{questions[questionIndex].question}</p>
         </div>
       );
+    }
+
+    function getBorderColor(answered2, currAnswer) {
+      // ela verifica se o usuário respondeu algo, se não,
+      // mantem a cor dos botões. Depois do usuário responder,
+      // troca a cor de todos os botões de acordo com a resposta.
+      let result;
+      // console.log(answered2, currAnswer);
+      if (answered2) {
+        if (currAnswer) {
+          result = '3px solid rgb(6, 240, 15)';
+        } else {
+          result = '3px solid red';
+        }
+      } else {
+        result = '1px solid black';
+      }
+      return result;
     }
 
     return (
@@ -168,6 +186,7 @@ class GamePage extends Component {
             <button
               type="button"
               key={ i }
+              style={ { border: getBorderColor(isAnswered, currAnswer.value) } }
               disabled={ areDisabled }
               onClick={ () => this.checkAnswer(currAnswer) }
               data-testid={ currAnswer.value ? 'correct-answer'
