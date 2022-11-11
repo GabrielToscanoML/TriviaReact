@@ -10,6 +10,7 @@ class GamePage extends Component {
     this.state = {
       questionIndex: 0,
       score: 0,
+      isAnswered: false,
     };
   }
 
@@ -40,11 +41,23 @@ class GamePage extends Component {
     history.push('/');
   };
 
+  nextOne = () => {
+    this.setState({
+      isAnswered: false,
+    }, () => {
+      this.setState((prevState) => ({
+        ...prevState,
+        questionIndex: prevState.questionIndex + 1,
+      }));
+    });
+  };
+
   checkAnswer = (answer) => {
     const { questionIndex } = this.state;
 
     this.setState({
-      questionIndex: questionIndex + 1 });
+      isAnswered: true,
+    });
 
     console.log(answer.value ? 'Correto!' : 'Incorreto!');
 
@@ -71,7 +84,12 @@ class GamePage extends Component {
   };
 
   render() {
-    const { questions, questionIndex, score } = this.state;
+    const {
+      questions,
+      questionIndex,
+      score,
+      isAnswered,
+    } = this.state;
     if (!questions) return <p>Loading...</p>;
 
     const answers = this.prepData(questions, questionIndex);
@@ -108,6 +126,17 @@ class GamePage extends Component {
             >
               {currAnswer.answer}
             </button>))}
+          <div>
+            {isAnswered && (
+              <button
+                type="button"
+                data-testid="btn-next"
+                onClick={ this.nextOne }
+              >
+                Next
+              </button>
+            )}
+          </div>
         </section>
       </div>
     );
