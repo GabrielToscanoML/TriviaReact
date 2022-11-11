@@ -14,7 +14,7 @@ class GamePage extends Component {
       score: 0,
       isAnswered: false,
       timer: 30,
-      isWaiting: true,
+      isWaiting: false,
       areDisabled: false,
     };
   }
@@ -26,7 +26,8 @@ class GamePage extends Component {
       const response = await fetch(`https://opentdb.com/api.php?amount=5&token=${localToken}`);
       const questions = await response.json();
 
-      this.waitFiveSeconds(this.startTimer);
+      // this.waitFiveSeconds();
+      this.startTimer();
 
       const expiredTokenCode = 3;
       if (questions.response_code === expiredTokenCode
@@ -41,15 +42,15 @@ class GamePage extends Component {
     }
   }
 
-  waitFiveSeconds = (funcToBeExecuted) => {
-    this.setState({ isWaiting: true });
+  // waitFiveSeconds = (funcToBeExecuted) => {
+  //   this.setState({ isWaiting: true });
 
-    const fiveSeconds = 5000;
-    setTimeout(() => {
-      funcToBeExecuted();
-      this.setState({ isWaiting: false });
-    }, fiveSeconds);
-  };
+  //   const fiveSeconds = 5000;
+  //   setTimeout(() => {
+  //     funcToBeExecuted();
+  //     this.setState({ isWaiting: false });
+  //   }, fiveSeconds);
+  // };
 
   redirectToPage = (pathname = '/') => {
     const { history } = this.props;
@@ -180,14 +181,12 @@ class GamePage extends Component {
       <div>
         <Header />
 
-        <p id="score">
+        <p data-testid="header-score" id="score">
           Score:
-          {' '}
           {score}
         </p>
         <span>
           Time:
-          {' '}
           {timer}
         </span>
         <p
