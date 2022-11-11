@@ -1,4 +1,5 @@
 // import { PLAYER_USER } from '../actions';
+import { resetScore } from '../actions';
 
 const initialState = {
   name: '',
@@ -15,6 +16,10 @@ const player = (state = initialState, action) => {
       name: action.value.name,
       gravatarEmail: action.value.email,
       score: action.value.score,
+    };
+  case resetScore:
+    return {
+      ...initialState,
     };
   default:
     return state;
