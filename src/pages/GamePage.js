@@ -18,7 +18,6 @@ class GamePage extends Component {
   }
 
   async componentDidMount() {
-    const { questionIndex } = this.state;
     const localToken = localStorage.getItem('token');
     try {
       const response = await fetch(`https://opentdb.com/api.php?amount=5&token=${localToken}`);
@@ -32,16 +31,12 @@ class GamePage extends Component {
         this.redirectToPage();
       }
 
-      this.setState({ questions: questions.results });
-      this.prepData(questions.results, questionIndex);
+      this.setState({ questions: questions.results,
+        answers: this.prepData(questions.results) });
     } catch (error) {
       console.log(error);
       this.redirectToPage();
     }
-  }
-
-  componentDidUpdate() {
-
   }
 
   waitFiveSeconds = (funcToBeExecuted) => {
@@ -64,6 +59,10 @@ class GamePage extends Component {
   };
 
   nextOne = () => {
+    const { questionIndex } = this.state;
+    const maxQuestionIndex = 4;
+    if (questionIndex === maxQuestionIndex) this.redirectToPage('/feedback');
+
     this.setState({
       isAnswered: false,
     }, () => {
@@ -72,40 +71,37 @@ class GamePage extends Component {
         questionIndex: prevState.questionIndex + 1,
       }));
     });
+    this.startTimer();
   };
 
   checkAnswer = (answer) => {
-    const { questionIndex } = this.state;
+    const { interval } = this.state;
 
     this.setState({
       isAnswered: true,
     });
 
-    console.log(answer.value ? 'Correto!' : 'Incorreto!');
+    clearInterval(interval);
 
-    const maxQuestionsDelayed = 4;
-    if (questionIndex === maxQuestionsDelayed) return this.redirectToPage('/feedback');
+    console.log(answer.value ? 'Correto!' : 'Incorreto!');
   };
 
-  prepData = (possibleAnswers, index) => {
-    const currQuestion = possibleAnswers[index];
-
+  prepData = (possibleAnswers) => possibleAnswers.map((currQuestion) => {
     if (currQuestion.type === 'boolean') {
       const answers = [{ answer: currQuestion.correct_answer, value: true },
         { answer: currQuestion.incorrect_answers[0], value: false, index: 0 }];
       const numForShuffle = 0.5;
-      const ShuffledAnswers = answers.sort(() => numForShuffle - Math.random());
-      this.setState({ answers: ShuffledAnswers });
+      const shuffledAnswers = answers.sort(() => numForShuffle - Math.random());
+      return shuffledAnswers;
     }
-
     const incorrect = currQuestion.incorrect_answers
       .map((incAns, i) => ({ answer: incAns, value: false, index: i }));
     const correct = { answer: currQuestion.correct_answer, value: true };
     const answers = [...incorrect, correct];
     const numForShuffle = 0.5;
-    const ShuffledAnswers = answers.sort(() => numForShuffle - Math.random());
-    this.setState({ answers: ShuffledAnswers });
-  };
+    const shuffledAnswers = answers.sort(() => numForShuffle - Math.random());
+    return shuffledAnswers;
+  });
 
   startTimer = () => {
     this.setState({ timer: 30 });
@@ -120,6 +116,7 @@ class GamePage extends Component {
         clearInterval(interval);
       }
     }, oneSecond);
+    this.setState({ interval });
   };
 
   render() {
@@ -182,7 +179,7 @@ class GamePage extends Component {
           {questions[questionIndex].question}
         </p>
         <section data-testid="answer-options">
-          {answers.map((currAnswer, i) => (
+          {answers[questionIndex].map((currAnswer, i) => (
             <button
               type="button"
               key={ i }
