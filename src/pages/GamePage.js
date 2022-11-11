@@ -3,8 +3,7 @@ import { connect } from 'react-redux';
 import md5 from 'crypto-js/md5';
 import PropTypes from 'prop-types';
 import Header from '../components/Header';
-import { playerUser } from '../redux/actions';
-import { sumAssertion } from '../redux/actions';
+import { playerUser, sumAssertion } from '../redux/actions';
 
 class GamePage extends Component {
   constructor() {
@@ -42,16 +41,6 @@ class GamePage extends Component {
     }
   }
 
-  // waitFiveSeconds = (funcToBeExecuted) => {
-  //   this.setState({ isWaiting: true });
-
-  //   const fiveSeconds = 5000;
-  //   setTimeout(() => {
-  //     funcToBeExecuted();
-  //     this.setState({ isWaiting: false });
-  //   }, fiveSeconds);
-  // };
-
   redirectToPage = (pathname = '/') => {
     const { history } = this.props;
 
@@ -80,7 +69,7 @@ class GamePage extends Component {
   checkAnswer = (answer, difficulty) => {
     const { questionIndex, score, interval } = this.state;
     const { name, email, dispatch } = this.props;
-    
+
     if (answer.value === true) dispatch(sumAssertion(1));
     this.setState({
       isAnswered: true,
@@ -98,8 +87,8 @@ class GamePage extends Component {
       dispatch(playerUser({ name, score, picture: `https://www.gravatar.com/avatar/${md5(email).toString()}` }));
       this.redirectToPage('/feedback');
       };
-    };
-    
+  }
+
   prepData = (possibleAnswers) => possibleAnswers.map((currQuestion) => {
     if (currQuestion.type === 'boolean') {
       const answers = [{ answer: currQuestion.correct_answer, value: true },
