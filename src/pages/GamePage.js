@@ -4,6 +4,7 @@ import md5 from 'crypto-js/md5';
 import PropTypes from 'prop-types';
 import Header from '../components/Header';
 import { playerUser } from '../redux/actions';
+import { sumAssertion } from '../redux/actions';
 
 class GamePage extends Component {
   constructor() {
@@ -20,7 +21,6 @@ class GamePage extends Component {
   }
 
   async componentDidMount() {
-    const { questionIndex } = this.state;
     const localToken = localStorage.getItem('token');
     try {
       const response = await fetch(`https://opentdb.com/api.php?amount=5&token=${localToken}`);
@@ -35,8 +35,8 @@ class GamePage extends Component {
         this.redirectToPage();
       }
 
-      this.setState({ questions: questions.results });
-      this.prepData(questions.results, questionIndex);
+      this.setState({ questions: questions.results,
+        answers: this.prepData(questions.results) });
     } catch (error) {
       this.redirectToPage();
     }
@@ -62,6 +62,10 @@ class GamePage extends Component {
   };
 
   nextOne = () => {
+    const { questionIndex } = this.state;
+    const maxQuestionIndex = 4;
+    if (questionIndex === maxQuestionIndex) this.redirectToPage('/feedback');
+
     this.setState({
       isAnswered: false,
     }, () => {
@@ -70,14 +74,18 @@ class GamePage extends Component {
         questionIndex: prevState.questionIndex + 1,
       }));
     });
+    this.startTimer();
   };
 
   checkAnswer = (answer, difficulty) => {
-    const { questionIndex, score } = this.state;
+    const { questionIndex, score, interval } = this.state;
     const { name, email, dispatch } = this.props;
+    
+    if (answer.value === true) dispatch(sumAssertion(1));
     this.setState({
       isAnswered: true,
     });
+    clearInterval(interval);
     if (answer.value) {
       this.calculatePoints(difficulty);
     }
@@ -89,28 +97,24 @@ class GamePage extends Component {
       } else { localStorage.setItem('ranking', JSON.stringify([{ name, score, picture: `https://www.gravatar.com/avatar/${md5(email).toString()}` }])); }
       dispatch(playerUser({ name, score, picture: `https://www.gravatar.com/avatar/${md5(email).toString()}` }));
       this.redirectToPage('/feedback');
-    }
-  };
+    };
 
-  prepData = (possibleAnswers, index) => {
-    const currQuestion = possibleAnswers[index];
-
+  prepData = (possibleAnswers) => possibleAnswers.map((currQuestion) => {
     if (currQuestion.type === 'boolean') {
       const answers = [{ answer: currQuestion.correct_answer, value: true },
         { answer: currQuestion.incorrect_answers[0], value: false, index: 0 }];
       const numForShuffle = 0.5;
-      const ShuffledAnswers = answers.sort(() => numForShuffle - Math.random());
-      this.setState({ answers: ShuffledAnswers });
+      const shuffledAnswers = answers.sort(() => numForShuffle - Math.random());
+      return shuffledAnswers;
     }
-
     const incorrect = currQuestion.incorrect_answers
       .map((incAns, i) => ({ answer: incAns, value: false, index: i }));
     const correct = { answer: currQuestion.correct_answer, value: true };
     const answers = [...incorrect, correct];
     const numForShuffle = 0.5;
-    const ShuffledAnswers = answers.sort(() => numForShuffle - Math.random());
-    this.setState({ answers: ShuffledAnswers });
-  };
+    const shuffledAnswers = answers.sort(() => numForShuffle - Math.random());
+    return shuffledAnswers;
+  });
 
   startTimer = () => {
     this.setState({ timer: 30 });
@@ -125,6 +129,7 @@ class GamePage extends Component {
         clearInterval(interval);
       }
     }, oneSecond);
+    this.setState({ interval });
   };
 
   calculatePoints = () => {
@@ -165,6 +170,7 @@ class GamePage extends Component {
 
     function getBorderColor(answered2, currAnswer) {
       let result;
+
       if (answered2) {
         if (currAnswer) {
           result = '3px solid rgb(6, 240, 15)';
@@ -202,7 +208,7 @@ class GamePage extends Component {
           {questions[questionIndex].question}
         </p>
         <section data-testid="answer-options">
-          {answers.map((currAnswer, i) => (
+          {answers[questionIndex].map((currAnswer, i) => (
             <button
               type="button"
               key={ i }

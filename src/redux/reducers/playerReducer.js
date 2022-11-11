@@ -1,4 +1,5 @@
 // import { PLAYER_USER } from '../actions';
+import { resetScore, SUM_ASSERTIONS } from '../actions';
 
 const initialState = {
   name: '',
@@ -10,12 +11,20 @@ const initialState = {
 const player = (state = initialState, action) => {
   switch (action.type) {
   case 'PLAYER_USER':
-  //  console.log(action.value);
     return {
       ...state,
       name: action.value.name,
       gravatarEmail: action.value.email,
       score: action.value.score,
+    };
+  case resetScore:
+    return {
+      ...initialState,
+    };
+  case SUM_ASSERTIONS:
+    return {
+      ...state,
+      assertions: state.assertions + action.payload,
     };
   default:
     return state;
