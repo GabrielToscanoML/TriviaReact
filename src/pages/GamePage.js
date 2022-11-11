@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import md5 from 'crypto-js/md5';
 import PropTypes from 'prop-types';
 import Header from '../components/Header';
+import { playerUser } from '../redux/actions';
 
 class GamePage extends Component {
   constructor() {
@@ -35,13 +37,8 @@ class GamePage extends Component {
       this.setState({ questions: questions.results });
       this.prepData(questions.results, questionIndex);
     } catch (error) {
-      console.log(error);
       this.redirectToPage();
     }
-  }
-
-  componentDidUpdate() {
-
   }
 
   waitFiveSeconds = (funcToBeExecuted) => {
@@ -74,17 +71,24 @@ class GamePage extends Component {
     });
   };
 
-  checkAnswer = (answer) => {
-    const { questionIndex } = this.state;
-
+  checkAnswer = (answer, difficulty) => {
+    const { questionIndex, score } = this.state;
+    const { name, email, dispatch } = this.props;
     this.setState({
       isAnswered: true,
     });
-
-    console.log(answer.value ? 'Correto!' : 'Incorreto!');
-
+    if (answer.value) {
+      this.calculatePoints(difficulty);
+    }
     const maxQuestionsDelayed = 4;
-    if (questionIndex === maxQuestionsDelayed) return this.redirectToPage('/feedback');
+    if (questionIndex === maxQuestionsDelayed) {
+      const verification = JSON.parse(localStorage.getItem('ranking'));
+      if (verification) {
+        localStorage.setItem('ranking', JSON.stringify([...verification, { name, score, picture: `https://www.gravatar.com/avatar/${md5(email).toString()}` }]));
+      } else { localStorage.setItem('ranking', JSON.stringify([{ name, score, picture: `https://www.gravatar.com/avatar/${md5(email).toString()}` }])); }
+      dispatch(playerUser({ name, score, picture: `https://www.gravatar.com/avatar/${md5(email).toString()}` }));
+      this.redirectToPage('/feedback');
+    }
   };
 
   prepData = (possibleAnswers, index) => {
@@ -122,6 +126,27 @@ class GamePage extends Component {
     }, oneSecond);
   };
 
+  calculatePoints = () => {
+    const { questions, questionIndex, timer, score } = this.state;
+    let points = 0;
+    const hard = 3;
+    const medium = 2;
+    switch (questions[questionIndex].difficulty) {
+    case 'easy':
+      points = timer;
+      break;
+    case 'medium':
+      points = timer * medium;
+      break;
+    case 'hard':
+      points = timer * hard;
+      break;
+    default:
+      break;
+    }
+    this.setState({ score: score + points });
+  };
+
   render() {
     const { questions, questionIndex, score, timer, answers,
       areDisabled, isWaiting, isAnswered } = this.state;
@@ -138,11 +163,7 @@ class GamePage extends Component {
     }
 
     function getBorderColor(answered2, currAnswer) {
-      // ela verifica se o usuário respondeu algo, se não,
-      // mantem a cor dos botões. Depois do usuário responder,
-      // troca a cor de todos os botões de acordo com a resposta.
       let result;
-      // console.log(answered2, currAnswer);
       if (answered2) {
         if (currAnswer) {
           result = '3px solid rgb(6, 240, 15)';
@@ -188,7 +209,10 @@ class GamePage extends Component {
               key={ i }
               style={ { border: getBorderColor(isAnswered, currAnswer.value) } }
               disabled={ areDisabled }
-              onClick={ () => this.checkAnswer(currAnswer) }
+              onClick={ () => this.checkAnswer(
+                currAnswer,
+                questions[questionIndex].difficulty,
+              ) }
               data-testid={ currAnswer.value ? 'correct-answer'
                 : `wrong-answer-${currAnswer.index}` }
             >
@@ -213,6 +237,13 @@ class GamePage extends Component {
 
 GamePage.propTypes = {
   history: PropTypes.shape({ push: PropTypes.func.isRequired }).isRequired,
+  email: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
+  dispatch: PropTypes.func.isRequired,
 };
+const mapStateToProps = (state) => ({
+  email: state.player.gravatarEmail,
+  name: state.player.name,
+});
 
-export default connect()(GamePage);
+export default connect(mapStateToProps)(GamePage);

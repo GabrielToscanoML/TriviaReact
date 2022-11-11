@@ -4,6 +4,7 @@ const initialState = {
   name: '',
   score: 0,
   gravatarEmail: '',
+  assertions: 0,
 };
 
 const player = (state = initialState, action) => {
