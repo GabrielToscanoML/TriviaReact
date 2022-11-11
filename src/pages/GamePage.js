@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import Header from '../components/Header';
+import { sumAssertion } from '../redux/actions';
 
 class GamePage extends Component {
   constructor() {
@@ -34,7 +35,6 @@ class GamePage extends Component {
       this.setState({ questions: questions.results,
         answers: this.prepData(questions.results) });
     } catch (error) {
-      console.log(error);
       this.redirectToPage();
     }
   }
@@ -76,7 +76,9 @@ class GamePage extends Component {
 
   checkAnswer = (answer) => {
     const { interval } = this.state;
+    const { dispatch } = this.props;
 
+    if (answer.value === true) dispatch(sumAssertion(1));
     this.setState({
       isAnswered: true,
     });
@@ -135,11 +137,8 @@ class GamePage extends Component {
     }
 
     function getBorderColor(answered2, currAnswer) {
-      // ela verifica se o usuário respondeu algo, se não,
-      // mantem a cor dos botões. Depois do usuário responder,
-      // troca a cor de todos os botões de acordo com a resposta.
       let result;
-      // console.log(answered2, currAnswer);
+
       if (answered2) {
         if (currAnswer) {
           result = '3px solid rgb(6, 240, 15)';
@@ -210,6 +209,7 @@ class GamePage extends Component {
 
 GamePage.propTypes = {
   history: PropTypes.shape({ push: PropTypes.func.isRequired }).isRequired,
+  dispatch: PropTypes.func.isRequired,
 };
 
 export default connect()(GamePage);
