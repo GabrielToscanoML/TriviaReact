@@ -86,8 +86,8 @@ class GamePage extends Component {
       } else { localStorage.setItem('ranking', JSON.stringify([{ name, score, picture: `https://www.gravatar.com/avatar/${md5(email).toString()}` }])); }
       dispatch(playerUser({ name, score, picture: `https://www.gravatar.com/avatar/${md5(email).toString()}` }));
       this.redirectToPage('/feedback');
-      };
-  }
+    }
+  };
 
   prepData = (possibleAnswers) => possibleAnswers.map((currQuestion) => {
     if (currQuestion.type === 'boolean') {
