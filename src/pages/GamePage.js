@@ -69,14 +69,13 @@ class GamePage extends Component {
   checkAnswer = (answer, difficulty) => {
     const { questionIndex, score, interval } = this.state;
     const { name, email, dispatch } = this.props;
-
-    if (answer.value === true) dispatch(sumAssertion(1));
     this.setState({
       isAnswered: true,
     });
     clearInterval(interval);
     if (answer.value) {
       this.calculatePoints(difficulty);
+      dispatch(sumAssertion(1));
     }
     const maxQuestionsDelayed = 4;
     if (questionIndex === maxQuestionsDelayed) {
@@ -85,7 +84,7 @@ class GamePage extends Component {
         localStorage.setItem('ranking', JSON.stringify([...verification, { name, score, picture: `https://www.gravatar.com/avatar/${md5(email).toString()}` }]));
       } else { localStorage.setItem('ranking', JSON.stringify([{ name, score, picture: `https://www.gravatar.com/avatar/${md5(email).toString()}` }])); }
       dispatch(playerUser({ name, score, picture: `https://www.gravatar.com/avatar/${md5(email).toString()}` }));
-      this.redirectToPage('/feedback');
+      // this.redirectToPage('/feedback');
     }
   };
 
