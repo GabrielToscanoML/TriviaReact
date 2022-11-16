@@ -2,9 +2,24 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { resetScore } from '../redux/actions';
-import Header from '../components/Header';
 
 class Ranking extends React.Component {
+  constructor() {
+    super();
+
+    this.state = {
+      localRanking: [],
+    };
+  }
+
+  componentDidMount() {
+    const localData = JSON.parse(localStorage.getItem('ranking'));
+
+    const sortData = localData.sort((a, b) => b.score - a.score);
+
+    this.setState({ localRanking: sortData });
+  }
+
   handleClick = () => {
     const { history, dispatch } = this.props;
     dispatch(resetScore());
@@ -12,19 +27,31 @@ class Ranking extends React.Component {
   };
 
   render() {
-    return (
-      <div>
-        <Header />
-        <h4 data-testid="ranking-title">Ranking</h4>
-        <button
-          type="button"
-          data-testid="btn-go-home"
-          onClick={ this.handleClick }
-        >
-          Login
-        </button>
-      </div>
-    );
+    const { localRanking } = this.state;
+
+    if (localRanking) {
+      return (
+        <div>
+          <h4 data-testid="ranking-title">Ranking</h4>
+          <button
+            type="button"
+            data-testid="btn-go-home"
+            onClick={ this.handleClick }
+          >
+            Login
+          </button>
+          <div>
+            {localRanking.map((player, i) => (
+              <span key={ i }>
+                <img src={ player.picture } alt="Player Avatar" />
+                <span data-testid={ `player-name-${i}` }>{player.name}</span>
+                <span data-testid={ `player-score-${i}` }>{player.score}</span>
+              </span>
+            ))}
+          </div>
+        </div>
+      );
+    }
   }
 }
 
