@@ -66,24 +66,25 @@ class GamePage extends Component {
     this.startTimer();
   };
 
-  checkAnswer = (answer, difficulty) => {
-    const { questionIndex, score, interval } = this.state;
-    const { name, email, dispatch } = this.props;
+  checkAnswer = (answer) => {
+    const { questionIndex, interval } = this.state;
+    const { name, email } = this.props;
     this.setState({
       isAnswered: true,
     });
+
     clearInterval(interval);
-    if (answer.value) {
-      this.calculatePoints(difficulty);
-      dispatch(sumAssertion(1));
-    }
+
+    this.calculatePoints(answer);
+
+    const { score } = this.state;
+
     const maxQuestionsDelayed = 4;
     if (questionIndex === maxQuestionsDelayed) {
       const verification = JSON.parse(localStorage.getItem('ranking'));
       if (verification) {
         localStorage.setItem('ranking', JSON.stringify([...verification, { name, score, picture: `https://www.gravatar.com/avatar/${md5(email).toString()}` }]));
       } else { localStorage.setItem('ranking', JSON.stringify([{ name, score, picture: `https://www.gravatar.com/avatar/${md5(email).toString()}` }])); }
-      dispatch(playerUser({ name, score, picture: `https://www.gravatar.com/avatar/${md5(email).toString()}` }));
       // this.redirectToPage('/feedback');
     }
   };
@@ -121,25 +122,32 @@ class GamePage extends Component {
     this.setState({ interval });
   };
 
-  calculatePoints = () => {
+  calculatePoints = (answer) => {
     const { questions, questionIndex, timer, score } = this.state;
-    let points = 0;
-    const hard = 3;
-    const medium = 2;
-    switch (questions[questionIndex].difficulty) {
-    case 'easy':
-      points = timer;
-      break;
-    case 'medium':
-      points = timer * medium;
-      break;
-    case 'hard':
-      points = timer * hard;
-      break;
-    default:
-      break;
+    const { dispatch, name, email } = this.props;
+    if (answer.value) {
+      dispatch(sumAssertion(1));
+      let points = 0;
+      const hard = 3;
+      const medium = 2;
+      switch (questions[questionIndex].difficulty) {
+      case 'easy':
+        points = timer;
+        break;
+      case 'medium':
+        points = timer * medium;
+        break;
+      case 'hard':
+        points = timer * hard;
+        break;
+      default:
+        break;
+      }
+      const newScore = score + points;
+      dispatch(playerUser({ name, score: newScore, picture: `https://www.gravatar.com/avatar/${md5(email).toString()}` }));
+      return this.setState({ score: newScore });
     }
-    this.setState({ score: score + points });
+    this.setState({ score });
   };
 
   render() {
@@ -159,7 +167,6 @@ class GamePage extends Component {
 
     function getBorderColor(answered2, currAnswer) {
       let result;
-
       if (answered2) {
         if (currAnswer) {
           result = '3px solid rgb(6, 240, 15)';
@@ -175,10 +182,9 @@ class GamePage extends Component {
     return (
       <div>
         <Header />
-
         <p data-testid="header-score" id="score">
           Score:
-          {score}
+          { score }
         </p>
         <span>
           Time:
@@ -203,10 +209,7 @@ class GamePage extends Component {
               key={ i }
               style={ { border: getBorderColor(isAnswered, currAnswer.value) } }
               disabled={ areDisabled }
-              onClick={ () => this.checkAnswer(
-                currAnswer,
-                questions[questionIndex].difficulty,
-              ) }
+              onClick={ () => this.checkAnswer(currAnswer) }
               data-testid={ currAnswer.value ? 'correct-answer'
                 : `wrong-answer-${currAnswer.index}` }
             >
@@ -231,9 +234,12 @@ class GamePage extends Component {
 
 GamePage.propTypes = {
   history: PropTypes.shape({ push: PropTypes.func.isRequired }).isRequired,
-  email: PropTypes.string.isRequired,
+  email: PropTypes.string,
   name: PropTypes.string.isRequired,
   dispatch: PropTypes.func.isRequired,
+};
+GamePage.defaultProps = {
+  email: 'defaultEmail@email.com',
 };
 const mapStateToProps = (state) => ({
   email: state.player.gravatarEmail,

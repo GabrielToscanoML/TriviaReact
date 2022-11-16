@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { resetScore } from '../redux/actions';
+import Header from '../components/Header';
 
 class Ranking extends React.Component {
   handleClick = () => {
@@ -13,6 +14,7 @@ class Ranking extends React.Component {
   render() {
     return (
       <div>
+        <Header />
         <h4 data-testid="ranking-title">Ranking</h4>
         <button
           type="button"
