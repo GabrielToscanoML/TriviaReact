@@ -112,7 +112,6 @@ class GamePage extends Component {
 
       if (timer === 1) {
         this.setState({ areDisabled: true });
-
         clearInterval(interval);
       }
     }, oneSecond);
