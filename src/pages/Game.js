@@ -126,18 +126,12 @@ class GamePage extends Component {
       let points = 0;
       const hard = 3;
       const medium = 2;
-      switch (questions[questionIndex].difficulty) {
-      case 'easy':
+      if (questions[questionIndex].difficulty === 'easy') {
         points = timer;
-        break;
-      case 'medium':
+      } else if (questions[questionIndex].difficulty === 'medium') {
         points = timer * medium;
-        break;
-      case 'hard':
+      } else {
         points = timer * hard;
-        break;
-      default:
-        break;
       }
       const newScore = score + points;
       dispatch(playerUser({ name, score: newScore, picture: `https://www.gravatar.com/avatar/${md5(email).toString()}` }));

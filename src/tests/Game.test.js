@@ -2,10 +2,38 @@ import userEvent from "@testing-library/user-event";
 import renderWithRouterAndRedux from "./helpers/renderWithRouterAndRedux";
 import { screen, waitForElementToBeRemoved, waitFor } from '@testing-library/react';
 import GamePage from "../pages/Game";
-// import App from "../App";
-
 
 describe('Testes da página "GamePage"', () => {
+  jest.setTimeout(30000);
+
+  test('Testa se as respostas ficam desabilitadas após o timer zerar', async () => {
+    jest.spyOn(global, 'fetch');
+    global.fetch.mockResolvedValue({
+      json: jest.fn().mockResolvedValue({token: 'testeDeToken', results:[
+        {
+          "category":"Entertainment: Video Games",
+          "type":"multiple",
+          "difficulty":"easy",
+          "question":"What is the first weapon you acquire in Half-Life?",
+          "correct_answer":"A crowbar",
+          "incorrect_answers":[
+              "A pistol",
+              "The H.E.V suit",
+              "Your fists"
+          ]
+        },]}),
+    });
+    renderWithRouterAndRedux(<GamePage />);
+    await waitForElementToBeRemoved(() => screen.queryByText("Loading..."));
+    const timer = screen.getByText(/30/i);
+    const buttonAnswer = screen.getByTestId('correct-answer');
+
+    await waitFor(() => {
+      // expect(timer).toHaveTextContent('1');
+      expect(buttonAnswer).toBeDisabled();
+    }, {timeout: 30000});
+  });
+
   test('Testa se o timer reduz os segundos', async () => {
     jest.spyOn(global, 'fetch');
     global.fetch.mockResolvedValue({
@@ -135,4 +163,16 @@ describe('Testes da página "GamePage"', () => {
     userEvent.click(buttonAnswer);
     expect(userScore[1]).toHaveTextContent('60');
   });
+
+  // test('Testa erro de token inválido', async () => {
+  //   jest.spyOn(global, 'fetch');
+  //   global.fetch.mockResolvedValue({
+  //     json: jest.fn().mockResolvedValue({
+  //       "response_code": 3,
+  //       "results": []
+  //     }),
+  //   });
+  //   const { history } = renderWithRouterAndRedux(<GamePage />);
+  //   expect(history.location.pathname).toBe('/');
+  // });
 });
