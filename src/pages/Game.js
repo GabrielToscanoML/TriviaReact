@@ -14,7 +14,6 @@ class GamePage extends Component {
       score: 0,
       isAnswered: false,
       timer: 30,
-      isWaiting: false,
       areDisabled: false,
     };
   }
@@ -25,7 +24,6 @@ class GamePage extends Component {
       const response = await fetch(`https://opentdb.com/api.php?amount=5&token=${localToken}`);
       const questions = await response.json();
 
-      // this.waitFiveSeconds();
       this.startTimer();
 
       const expiredTokenCode = 3;
@@ -85,7 +83,6 @@ class GamePage extends Component {
       if (verification) {
         localStorage.setItem('ranking', JSON.stringify([...verification, { name, score, picture: `https://www.gravatar.com/avatar/${md5(email).toString()}` }]));
       } else { localStorage.setItem('ranking', JSON.stringify([{ name, score, picture: `https://www.gravatar.com/avatar/${md5(email).toString()}` }])); }
-      // this.redirectToPage('/feedback');
     }
   };
 
@@ -152,17 +149,8 @@ class GamePage extends Component {
 
   render() {
     const { questions, questionIndex, score, timer, answers,
-      areDisabled, isWaiting, isAnswered } = this.state;
+      areDisabled, isAnswered } = this.state;
     if (!questions) return <p>Loading...</p>;
-    if (isWaiting) {
-      return (
-        <div>
-          <Header />
-          <p>{questions[questionIndex].category}</p>
-          <p>{questions[questionIndex].question}</p>
-        </div>
-      );
-    }
 
     function getBorderColor(answered2, currAnswer) {
       let result;
