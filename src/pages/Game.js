@@ -5,6 +5,8 @@ import PropTypes from 'prop-types';
 import Header from '../components/Header';
 import { playerUser, sumAssertion } from '../redux/actions';
 
+import '../styles/Game.css';
+
 class GamePage extends Component {
   constructor() {
     super();
@@ -162,51 +164,64 @@ class GamePage extends Component {
     return (
       <div>
         <Header />
-        <p data-testid="header-score" id="score">
-          Score:
-          { score }
-        </p>
-        <span>
-          Time:
-          {timer}
-        </span>
-        <p
-          id="category"
-          data-testid="question-category"
-        >
-          {questions[questionIndex].category}
-        </p>
-        <p
-          id="quenstionText"
-          data-testid="question-text"
-        >
-          {questions[questionIndex].question}
-        </p>
-        <section data-testid="answer-options">
-          {answers[questionIndex].map((currAnswer, i) => (
-            <button
-              type="button"
-              key={ i }
-              style={ { border: getBorderColor(isAnswered, currAnswer.value) } }
-              disabled={ areDisabled }
-              onClick={ () => this.checkAnswer(currAnswer) }
-              data-testid={ currAnswer.value ? 'correct-answer'
-                : `wrong-answer-${currAnswer.index}` }
+        <main className="main-game-container">
+          <section className="left-side">
+            <p
+              id="category"
+              data-testid="question-category"
             >
-              {currAnswer.answer}
-            </button>))}
-          <div>
-            {isAnswered && (
+              {questions[questionIndex].category}
+            </p>
+            <p
+              id="quenstionText"
+              data-testid="question-text"
+            >
+              {questions[questionIndex].question}
+            </p>
+            <div className="timer-score">
+              <span>
+                Time:
+                { ' ' }
+                {timer}
+              </span>
+              <p data-testid="header-score" id="score">
+                Score:
+                { ' ' }
+                { score }
+              </p>
+            </div>
+          </section>
+          <section
+            className="game-right-side"
+            data-testid="answer-options"
+          >
+            {answers[questionIndex].map((currAnswer, i) => (
               <button
+                className="some-buttons"
                 type="button"
-                data-testid="btn-next"
-                onClick={ this.nextOne }
+                key={ i }
+                style={ { border: getBorderColor(isAnswered, currAnswer.value) } }
+                disabled={ areDisabled }
+                onClick={ () => this.checkAnswer(currAnswer) }
+                data-testid={ currAnswer.value ? 'correct-answer'
+                  : `wrong-answer-${currAnswer.index}` }
               >
-                Next
-              </button>
-            )}
-          </div>
-        </section>
+                {currAnswer.answer}
+              </button>))}
+            <div>
+              {isAnswered && (
+                <button
+                  className="some-buttons next-button"
+                  type="button"
+                  data-testid="btn-next"
+                  onClick={ this.nextOne }
+                >
+                  Next
+                </button>
+              )}
+            </div>
+          </section>
+        </main>
       </div>
     );
   }

@@ -1,0 +1,52 @@
+.main-game-container {
+  margin-top: 16px;
+  padding: 16px;
+  border-radius: 8px;
+  height: 480px;
+  max-width: 1280px;
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.left-side {
+  background-color: #e3e5e4;
+  color: black;
+  width: 480px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
+
+.timer-score {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.game-right-side {
+  width: 480px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.some-buttons {
+  width: 350px;
+  height: 40px;
+  border-radius: 8px;
+  font-size: 20px;
+}
+
+.next-button {
+  background-color: #4dc18b;
+  color: white;
+  font-weight: bold;
+  height: 44px;
+}

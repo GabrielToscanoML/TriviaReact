@@ -1,0 +1,50 @@
+.main-login-container {
+  display: flex;
+  height: 100vh;
+}
+
+.form-container {
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 600px;
+  height: 350px;
+  background-color: #fff;
+  border-radius: 16px;
+  gap: 8px;
+}
+.form-container > h1 {
+  color: black;
+}
+.form-container > label > input {
+  width: 250px;
+  height: 32px;
+  border-radius: 8px;
+  padding: 5px 10px;
+  font-size: 16px;
+}
+
+.form-container > label > input {
+  border: 2px solid #34176A;
+}
+
+.form-container > button {
+  background-color: #3B1A79;
+  color: #fff;
+  width: 272px;
+  height: 44px;
+  border-radius: 8px;
+  padding: 5px 10px;
+  font-size: 16px;
+}
+
+.form-container > button:hover {
+  cursor: pointer;
+}
+
+.form-container > button:disabled {
+  cursor: wait;
+  opacity: 0.5;
+}

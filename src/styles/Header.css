@@ -1,0 +1,32 @@
+.header-container {
+  width: 100%;
+  background-color: #e3e5e4;
+}
+
+.main-header-container {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 1280px;
+  display: flex;
+  justify-content: space-between;
+  color: black;
+  height: 64px;
+  align-items: center;
+}
+
+.main-header-container > section > h1 {
+  margin: 0;
+}
+
+.main-header-container > section > img {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+}
+
+.header-right-side {
+  display: flex;
+  align-items: end;
+  justify-content: center;
+  gap: 12px;
+}

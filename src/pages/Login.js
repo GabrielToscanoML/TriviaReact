@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { playerUser } from '../redux/actions';
 
+import '../styles/Login.css';
+
 class Login extends React.Component {
   constructor() {
     super();
@@ -17,7 +19,6 @@ class Login extends React.Component {
 
   handleChange = ({ target }) => {
     const { name, value } = target;
-
     this.setState({
       [name]: value,
     }, () => this.validationLogin());
@@ -62,45 +63,48 @@ class Login extends React.Component {
     if (loading) return <p>Loading...</p>;
 
     return (
-      <form>
-        <label htmlFor="name">
-          <input
-            type="text"
-            name="name"
-            placeholder="Nome"
-            value={ name }
-            onChange={ (e) => this.handleChange(e) }
-            id="name"
-            data-testid="input-player-name"
-          />
-        </label>
-        <label htmlFor="email">
-          <input
-            type="email"
-            name="email"
-            placeholder="E-mail"
-            value={ email }
-            onChange={ (e) => this.handleChange(e) }
-            id="email"
-            data-testid="input-gravatar-email"
-          />
-        </label>
-        <button
-          type="button"
-          data-testid="btn-play"
-          disabled={ this.validationLogin() }
-          onClick={ this.handleClick }
-        >
-          Play
-        </button>
-        <button
-          type="button"
-          data-testid="btn-settings"
-          onClick={ this.onClickButton }
-        >
-          Configurações
-        </button>
-      </form>
+      <main className="main-login-container">
+        <form className="form-container">
+          <h1>Welcome to Trivia!</h1>
+          <label htmlFor="name">
+            <input
+              type="text"
+              name="name"
+              placeholder="Name"
+              value={ name }
+              onChange={ (e) => this.handleChange(e) }
+              id="name"
+              data-testid="input-player-name"
+            />
+          </label>
+          <label htmlFor="email">
+            <input
+              type="email"
+              name="email"
+              placeholder="E-mail"
+              value={ email }
+              onChange={ (e) => this.handleChange(e) }
+              id="email"
+              data-testid="input-gravatar-email"
+            />
+          </label>
+          <button
+            type="button"
+            data-testid="btn-play"
+            disabled={ this.validationLogin() }
+            onClick={ this.handleClick }
+          >
+            Play
+          </button>
+          <button
+            type="button"
+            data-testid="btn-settings"
+            onClick={ this.onClickButton }
+          >
+            Settings
+          </button>
+        </form>
+      </main>
     );
   }
 }
