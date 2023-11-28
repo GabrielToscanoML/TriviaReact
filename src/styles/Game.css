@@ -21,6 +21,10 @@
   justify-content: space-evenly;
 }
 
+.left-side > h1 {
+  padding: 24px;
+}
+
 .timer-score {
   display: flex;
   align-items: center;
@@ -43,10 +47,28 @@
   border-radius: 8px;
   font-size: 20px;
 }
+.some-buttons:hover {
+  cursor: pointer;  
+}
 
 .next-button {
   background-color: #4dc18b;
   color: white;
   font-weight: bold;
   height: 44px;
+}
+
+.timer-score {
+  color: #ea5d5d;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+#category {
+  margin-right: auto;
+  margin-left: auto;
+  background-color: #6c4caa;
+  width: 80%;
+  color: #fff;
+  border-radius: 16px;
 }

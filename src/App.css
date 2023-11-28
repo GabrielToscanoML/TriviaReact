@@ -9,6 +9,14 @@ body {
   color: #fff;
 }
 
+.loading-container {
+  display: flex;
+  height: 100vh;
+  widht: 100%;
+  justify-content: center;
+  align-items: center;
+}
+
 .App {
   text-align: center;
 }

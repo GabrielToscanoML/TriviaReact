@@ -4,8 +4,12 @@ import md5 from 'crypto-js/md5';
 import PropTypes from 'prop-types';
 import Header from '../components/Header';
 import { playerUser, sumAssertion } from '../redux/actions';
+import Loading from '../components/Loading';
 
 import '../styles/Game.css';
+import timerIcon from '../assets/timer-image.svg';
+
+const he = require('he');
 
 class GamePage extends Component {
   constructor() {
@@ -25,15 +29,13 @@ class GamePage extends Component {
     try {
       const response = await fetch(`https://opentdb.com/api.php?amount=5&token=${localToken}`);
       const questions = await response.json();
-
       this.startTimer();
-
       const expiredTokenCode = 3;
       if (questions.response_code === expiredTokenCode
         || questions.token === 'INVALID_TOKEN') {
         this.redirectToPage();
       }
-
+      this.formatText(questions.results);
       this.setState({ questions: questions.results,
         answers: this.prepData(questions.results) });
     } catch (error) {
@@ -41,12 +43,20 @@ class GamePage extends Component {
     }
   }
 
+  formatText = (result) => {
+    result.forEach((obj) => {
+      obj.category = he.decode(obj.category);
+      obj.question = he.decode(obj.question);
+      obj.correct_answer = he.decode(obj.correct_answer);
+      obj.incorrect_answers = obj.incorrect_answers.map((answer) => he.decode(answer));
+    });
+    return result;
+  };
+
   redirectToPage = (pathname = '/') => {
     const { history } = this.props;
-
     localStorage.removeItem('token');
     this.setState({ questionIndex: 0 });
-
     history.push(pathname);
   };
 
@@ -54,7 +64,6 @@ class GamePage extends Component {
     const { questionIndex } = this.state;
     const maxQuestionIndex = 4;
     if (questionIndex === maxQuestionIndex) this.redirectToPage('/feedback');
-
     this.setState({
       isAnswered: false,
     }, () => {
@@ -72,13 +81,9 @@ class GamePage extends Component {
     this.setState({
       isAnswered: true,
     });
-
     clearInterval(interval);
-
     this.calculatePoints(answer);
-
     const { score } = this.state;
-
     const maxQuestionsDelayed = 4;
     if (questionIndex === maxQuestionsDelayed) {
       const verification = JSON.parse(localStorage.getItem('ranking'));
@@ -111,7 +116,6 @@ class GamePage extends Component {
     const interval = setInterval(() => {
       const { timer } = this.state;
       this.setState({ timer: timer - 1 });
-
       if (timer === 1) {
         this.setState({ areDisabled: true });
         clearInterval(interval);
@@ -145,7 +149,7 @@ class GamePage extends Component {
   render() {
     const { questions, questionIndex, score, timer, answers,
       areDisabled, isAnswered } = this.state;
-    if (!questions) return <p>Loading...</p>;
+    if (!questions) return <main className="loading-container"><Loading /></main>;
 
     function getBorderColor(answered2, currAnswer) {
       let result;
@@ -166,19 +170,20 @@ class GamePage extends Component {
         <Header />
         <main className="main-game-container">
           <section className="left-side">
-            <p
+            <h1
               id="category"
               data-testid="question-category"
             >
               {questions[questionIndex].category}
-            </p>
-            <p
+            </h1>
+            <h3
               id="quenstionText"
               data-testid="question-text"
             >
               {questions[questionIndex].question}
-            </p>
+            </h3>
             <div className="timer-score">
+              <img src={ timerIcon } alt="Timer Icon" />
               <span>
                 Time:
                 { ' ' }

@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { playerUser } from '../redux/actions';
 
 import '../styles/Login.css';
+import Loading from '../components/Loading';
 
 class Login extends React.Component {
   constructor() {
@@ -60,7 +61,7 @@ class Login extends React.Component {
   render() {
     const { email, name, loading } = this.state;
 
-    if (loading) return <p>Loading...</p>;
+    if (loading) return <main className="loading-container"><Loading /></main>;
 
     return (
       <main className="main-login-container">
