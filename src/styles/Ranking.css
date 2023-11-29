@@ -26,6 +26,10 @@
   font-size: 16px;
 }
 
+.btn-go-home:hover { 
+  cursor: pointer;
+}
+
 .li-container > h2 {
   margin: 0;
 }
