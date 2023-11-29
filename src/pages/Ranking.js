@@ -3,10 +3,11 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { resetScore } from '../redux/actions';
 
+import '../styles/Ranking.css';
+
 class Ranking extends React.Component {
   constructor() {
     super();
-
     this.state = {
       localRanking: [],
     };
@@ -14,9 +15,7 @@ class Ranking extends React.Component {
 
   componentDidMount() {
     const localData = JSON.parse(localStorage.getItem('ranking'));
-
     const sortData = localData.sort((a, b) => b.score - a.score);
-
     this.setState({ localRanking: sortData });
   }
 
@@ -28,27 +27,33 @@ class Ranking extends React.Component {
 
   render() {
     const { localRanking } = this.state;
-
     return (
-      <div>
-        <h4 data-testid="ranking-title">Ranking</h4>
+      <main className="ranking-main-container">
+        <h1 data-testid="ranking-title">Ranking</h1>
         <button
           type="button"
           data-testid="btn-go-home"
+          className="btn-go-home"
           onClick={ this.handleClick }
         >
-          Login
+          Back to Login
         </button>
-        <div>
-          {localRanking.map((player, i) => (
-            <span key={ i }>
-              <img src={ player.picture } alt="Player Avatar" />
-              <span data-testid={ `player-name-${i}` }>{player.name}</span>
-              <span data-testid={ `player-score-${i}` }>{player.score}</span>
-            </span>
-          ))}
-        </div>
-      </div>
+        <section className="ranking-container">
+          <ol>
+            {localRanking.map((player, i) => (
+              <li
+                key={ i }
+              >
+                <div className="li-container">
+                  <img src={ player.picture } alt="Player Avatar" />
+                  <h2 data-testid={ `player-name-${i}` }>{player.name}</h2>
+                  <p data-testid={ `player-score-${i}` }>{player.score}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </section>
+      </main>
     );
   }
 }
