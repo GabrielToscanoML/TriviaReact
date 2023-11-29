@@ -1,0 +1,50 @@
+.feedback-main-container {
+  width: 250px;
+  background-color: #fff;
+  color: black;
+  border-radius: 16px;
+  height: 250px;
+  margin: 48px auto 0 auto;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+}
+.feedback-main-container > h2 {
+  margin: 0;
+}
+
+
+.red {
+  color: red;
+}
+
+.green {
+  color: green;
+}
+
+.score-assertion-section {
+  max-width: 180px;
+  text-align: start;
+  font-size: 20px;
+}
+
+.feedback-buttons-section {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.feedback-buttons-section > button {
+  height: 40px;
+  width: 96px;
+  border-radius: 8px;
+  background-color: #34176B;
+  color: white;
+  font-weight: bold;
+}
+
+.feedback-buttons-section > button:hover {
+  cursor: pointer;
+}
