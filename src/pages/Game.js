@@ -14,7 +14,6 @@ const he = require('he');
 class GamePage extends Component {
   constructor() {
     super();
-
     this.state = {
       questionIndex: 0,
       score: 0,
@@ -170,15 +169,12 @@ class GamePage extends Component {
         <Header />
         <main className="main-game-container">
           <section className="left-side">
-            <h1
-              id="category"
-              data-testid="question-category"
-            >
+            <h1 id="category">
               {questions[questionIndex].category}
             </h1>
             <h3
               id="quenstionText"
-              data-testid="question-text"
+              className="question-game"
             >
               {questions[questionIndex].question}
             </h3>
@@ -196,10 +192,7 @@ class GamePage extends Component {
               </p>
             </div>
           </section>
-          <section
-            className="game-right-side"
-            data-testid="answer-options"
-          >
+          <section className="game-right-side">
             {answers[questionIndex].map((currAnswer, i) => (
               <button
                 className="some-buttons"
@@ -208,8 +201,6 @@ class GamePage extends Component {
                 style={ { border: getBorderColor(isAnswered, currAnswer.value) } }
                 disabled={ areDisabled }
                 onClick={ () => this.checkAnswer(currAnswer) }
-                data-testid={ currAnswer.value ? 'correct-answer'
-                  : `wrong-answer-${currAnswer.index}` }
               >
                 {currAnswer.answer}
               </button>))}
@@ -218,7 +209,17 @@ class GamePage extends Component {
                 <button
                   className="some-buttons next-button"
                   type="button"
-                  data-testid="btn-next"
+                  onClick={ this.nextOne }
+                >
+                  Next
+                </button>
+              )}
+            </div>
+            <div>
+              {(timer === 0 && !isAnswered) && (
+                <button
+                  className="some-buttons next-button"
+                  type="button"
                   onClick={ this.nextOne }
                 >
                   Next

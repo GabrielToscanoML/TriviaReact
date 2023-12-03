@@ -9,15 +9,18 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: 600px;
+  max-width: 600px;
+  min-width: 350px;
   height: 350px;
   background-color: #fff;
   border-radius: 16px;
   gap: 8px;
 }
+
 .form-container > h1 {
   color: black;
 }
+
 .form-container > label > input {
   width: 250px;
   height: 32px;
